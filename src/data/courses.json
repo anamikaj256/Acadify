@@ -1,0 +1,30 @@
+[
+  {
+    "id": "CSE101",
+    "name": "Data Structures",
+    "credits": 4,
+    "grade": "A",
+    "gradePoints": 9
+  },
+  {
+    "id": "MAT201",
+    "name": "Discrete Mathematics",
+    "credits": 3,
+    "grade": "B+",
+    "gradePoints": 8
+  },
+  {
+    "id": "PHY110",
+    "name": "Physics Lab",
+    "credits": 1,
+    "grade": "A+",
+    "gradePoints": 10
+  },
+  {
+    "id": "ENG105",
+    "name": "English Communication",
+    "credits": 2,
+    "grade": "B",
+    "gradePoints": 7
+  }
+]

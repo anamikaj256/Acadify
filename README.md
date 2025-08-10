@@ -1,70 +1,155 @@
-# Getting Started with Create React App
+# Acadify — Student Dashboard (React)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Short description
 
-## Available Scripts
+Acadify is a responsive React-based student dashboard UI that matches the provided UI sketch. It implements a sidebar-driven layout where the main content area renders different pages (Dashboard/Home, Courses, CGPA, Assignments) based on sidebar selection. The NavBar shows a breadcrumb that reflects the sidebar selection and a top-right user dropdown with actions (Change Password, Edit Personal Data, Logout). The app uses local storage for simple persistence and React Context for global state.
 
-In the project directory, you can run:
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Main Content Area — Renders the currently selected page from the sidebar (Dashboard, Courses, CGPA, Assignments, etc.).
+2. Breadcrumb — NavBar displays the breadcrumb derived from the sidebar selection (e.g., `Home`, `Home / Courses`).
+3. User Dropdown — Top-right user icon shows a dropdown with `Change Password`, `Edit Personal Data`, and `Logout` actions.
+4. Dashboard Widgets — Clicking `Dashboard` shows widgets in the main content area (summary cards, charts, quick actions) per the UI sketch.
+5. Courses Page — Displays a table of courses with columns: `Course Name`, `Course Id`, `Credit Units`, `Student Grade`, `Grade Points`.
+6. CGPA Calculator— Calculates  CGPA based on the courses completed so far. 
+7. Assignments Page — Renders `Completed` and `Ongoing` assignments for the current semester with filter controls for `course id` and `assignment id`.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+## Tech stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* **React** (V18+)
+* **React Router** (routing & breadcrumbs)
+* **Tailwind CSS** (styling)
+* **React Context API** (UserContext, SidebarContext)
+* **localStorage** (persist preferences & session data)
+* **React Table or simple HTML table** (Courses)
 
-### `npm run build`
+## Quick start (local)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prerequisites
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* Node.js (16+)
+* npm or yarn
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Clone & install
 
-### `npm run eject`
+```bash
+# clone
+git clone <https://github.com/anamikaj256/Acadify.git>
+cd <Acadify>
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# install dependencies
+npm install
+# or
+# yarn
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Run in development
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm start
+# opens at http://localhost:3000
 
-## Learn More
+### Build for production
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+bash
+npm run build
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+## Project structure (suggested)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
+edu-dash/
+├── public/
+├── src/
+│   ├── components/
+│   │   ├── Sidebar.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── UserMenu.jsx
+│   │   └── PrivateRoute.jsx
+│   ├── context/
+│   │   ├── UserContext.jsx
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   ├── Courses.jsx
+│   │   ├── CGPA.jsx
+│   │   └── Assignments.jsx
+│   ├── data/
+│   │   ├── courses.json
+│   │   └── assignments.json
+│   ├── App.jsx
+│   └── index.jsx
+├── package.json
+└── README.md
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Making a Progressive Web App
+## Important implementation details
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Routing & Breadcrumbs
 
-### Advanced Configuration
+* Use `react-router-dom` to map routes to pages: `/`, `/courses`, `/cgpa`, `/assignments`.
+* Breadcrumb reads the current route or the active sidebar selection and renders like `Home` or `Home / Courses`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### State management
 
-### Deployment
+* UserContext: stores `user` object, auth state, and actions: `login`, `logout`, `changePassword`, `editProfile`.
+* SidebarContext: stores currently selected sidebar item so multiple components (Navbar, Main) can read it.
+* Persist user preferences and last active route to `localStorage` so the app restores state on reload.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Courses data format
 
-### `npm run build` fails to minify
+Sample `courses.json` entry:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+json
+{
+  "courseId": "CS101",
+  "courseName": "Intro to Computer Science",
+  "creditUnits": 3,
+  "studentGrade": "A",
+  "gradePoints": 9
+}
+
+
+
+### Assignments filters & layout
+
+* Table or list grouped by status (`Ongoing`, `Completed`).
+* Filters: search or select by `courseId` and `assignmentId`.
+
+
+### User dropdown actions
+
+* Change password: simple page that validates password & updates UserContext (mocked for frontend-only).
+* Edit personal data:  page with form fields kept in `UserContext` and stored to `localStorage`.
+* Logout: clears user session in context and localStorage.
+
+
+
+## Accessibility & Responsiveness
+
+* Sidebar collapses to icons on smaller screens.
+* Navbar remains sticky with breadcrumb & user dropdown accessible on mobile.
+
+
+
+## Deployment
+
+* Build with `npm run build` and host on any static host ( Vercel, GitHub Pages).
+* For GitHub Pages, use `gh-pages` package and set homepage in `package.json`.
+
+
+
+## Future enhancements
+
+* Backend integration (Node/Express) to persist users, courses, assignments
+* Authentication with JWT and real API
+* Real-time updates for assignments (websockets)
+* Analytics & reports export (CSV/PDF)
+
+
+
+## Contributing
+
+Contributions are welcome — fork the repo, create a branch, and open a pull request. Please add tests for new features.
+

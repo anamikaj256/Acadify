@@ -1,0 +1,54 @@
+{
+  "sections": [
+    {
+      "title": "Personal Data",
+      "icon": "FaUser",
+      "iconColor": "text-blue-500",
+      "items": [
+        { "label": "Name", "valueKey": "name", "fallback": "N/A" },
+        { "label": "Email", "valueKey": "email", "fallback": "N/A" },
+        { "label": "Role", "valueKey": "role", "fallback": "N/A" },
+        { "label": "Status", "valueKey": "status", "type": "statusBadge" }
+      ]
+    },
+    {
+      "title": "Guardian Data",
+      "icon": "FaUserShield",
+      "iconColor": "text-purple-500",
+      "items": [
+        { "label": "Guardian Name", "valueKey": "guardianName", "fallback": "N/A" },
+        { "label": "Relation", "valueKey": "guardianRelation", "fallback": "N/A" },
+        { "label": "Phone", "valueKey": "guardianPhone", "fallback": "N/A" }
+      ]
+    },
+    {
+      "title": "Academic Data",
+      "icon": "FaBook",
+      "iconColor": "text-green-500",
+      "items": [
+        { "label": "Course", "valueKey": "course", "fallback": "B.Tech" },
+        { "label": "Year", "valueKey": "year", "fallback": "N/A" },
+        { "label": "CGPA", "valueKey": "cgpa", "fallback": "N/A" }
+      ]
+    },
+    {
+      "title": "Performance",
+      "icon": "FaStar",
+      "iconColor": "text-yellow-500",
+      "items": [
+        { "label": "Assignments Completed", "valueKey": "assignments", "fallback": 8 },
+        { "label": "Projects", "valueKey": "projects", "fallback": 2 },
+        { "label": "Certifications", "valueKey": "certifications", "fallback": 3 }
+      ]
+    },
+    {
+      "title": "Achievements",
+      "icon": "FaCheck",
+      "iconColor": "text-teal-500",
+      "items": [
+        { "label": "Awards", "valueKey": "awards", "fallback": "N/A" },
+        { "label": "Scholarships", "valueKey": "scholarships", "fallback": "N/A" }
+      ]
+    }
+  ]
+}

@@ -1,30 +1,39 @@
+
 [
   {
-    "id": "CSE101",
+    "id": "c_cse101",
+    "code": "CSE101",
     "name": "Data Structures",
     "credits": 4,
     "grade": "A",
-    "gradePoints": 9
+    "gradePoints": 4.0,
+    "semester": "Sem 3"
   },
   {
-    "id": "MAT201",
+    "id": "c_mat201",
+    "code": "MAT201",
     "name": "Discrete Mathematics",
     "credits": 3,
     "grade": "B+",
-    "gradePoints": 8
+    "gradePoints": 3.3,
+    "semester": "Sem 1"
   },
   {
-    "id": "PHY110",
+    "id": "c_phy110",
+    "code": "PHY110",
     "name": "Physics Lab",
     "credits": 1,
     "grade": "A+",
-    "gradePoints": 10
+    "gradePoints": 4.0,
+    "semester": "Sem 1"
   },
   {
-    "id": "ENG105",
+    "id": "c_eng105",
+    "code": "ENG105",
     "name": "English Communication",
     "credits": 2,
     "grade": "B",
-    "gradePoints": 7
+    "gradePoints": 3,
+    "semester": "Sem 4"
   }
 ]

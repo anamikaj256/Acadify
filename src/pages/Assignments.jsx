@@ -1,33 +1,84 @@
-import { useState } from "react";
+import React, { useMemo, useState } from "react";
 import assignmentData from "../data/assignments.json";
+import { useCourse } from "../context/CourseContext";
+import CourseTable from "../components/CourseTable";
 
 const Assignments = () => {
+  const { courses = [] } = useCourse();
   const [filterStatus, setFilterStatus] = useState("All");
   const [courseFilter, setCourseFilter] = useState("");
   const [idFilter, setIdFilter] = useState("");
+  const [semesterFilter, setSemesterFilter] = useState("All");
 
+  // map course id -> course object
+  const courseMap = useMemo(
+    () => Object.fromEntries(courses.map((c) => [c.id, c])),
+    [courses]
+  );
+
+  // collect semesters from both courses and assignments
+  const semesters = useMemo(() => {
+    const s = new Set();
+    courses.forEach((c) => c.semester && s.add(String(c.semester)));
+    assignmentData.forEach((a) => a.semester && s.add(String(a.semester)));
+    return ["All", ...Array.from(s).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))];
+  }, [courses]);
+
+  // filter assignments
   const filtered = assignmentData.filter((a) => {
-    return (
-      (filterStatus === "All" || a.status === filterStatus) &&
-      a.courseId.toLowerCase().includes(courseFilter.toLowerCase()) &&
-      a.id.toLowerCase().includes(idFilter.toLowerCase())
-    );
+    const course = courseMap[a.courseId];
+    const courseName = course?.name || "";
+    const courseCode = course?.code || "";
+
+    const assignmentSemester =
+      a.semester ?? course?.semester ?? "";
+
+    const courseMatch =
+      !courseFilter.trim() ||
+      courseName.toLowerCase().includes(courseFilter.toLowerCase()) ||
+      courseCode.toLowerCase().includes(courseFilter.toLowerCase());
+
+    const statusMatch = filterStatus === "All" || a.status === filterStatus;
+    const idMatch = a.id.toLowerCase().includes(idFilter.toLowerCase());
+    const semesterMatch = semesterFilter === "All" || assignmentSemester === semesterFilter;
+
+    return courseMatch && statusMatch && idMatch && semesterMatch;
   });
+
+  // rows & columns for CourseTable
+  const rows = filtered.map((a) => {
+    const course = courseMap[a.courseId];
+    return {
+      id: a.id,
+      course: course ? `${course.name} (${course.code || course.id})` : a.courseId,
+      title: a.title,
+      dueDate: a.dueDate,
+      semester: a.semester ?? course?.semester ?? "—",
+      status: a.status,
+    };
+  });
+
+  const columns = [
+    { key: "id", label: "Assignment ID" },
+    { key: "course", label: "Course" },
+    { key: "title", label: "Title" },
+    { key: "dueDate", label: "Due Date" },
+    { key: "semester", label: "Semester" },
+    { key: "status", label: "Status" },
+  ];
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">Assignments</h2>
 
-      {/* Status Filter */}
+      {/* Filters */}
       <div className="flex gap-3 mb-4">
         {["All", "Completed", "Ongoing"].map((status) => (
           <button
             key={status}
             onClick={() => setFilterStatus(status)}
-            className={`px-4 py-1 rounded-full border transition-colors duration-200 shadow-sm ${
-              filterStatus === status
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white text-gray-600 hover:bg-gray-100 border-gray-300"
+            className={`px-4 py-1 rounded-full border ${
+              filterStatus === status ? "bg-blue-600 text-white" : "bg-white"
             }`}
           >
             {status}
@@ -35,62 +86,36 @@ const Assignments = () => {
         ))}
       </div>
 
-      {/* Input Filters */}
       <div className="flex gap-4 mb-6">
         <input
           type="text"
-          placeholder="Filter by Course ID"
+          placeholder="Filter by Course name or code"
           value={courseFilter}
           onChange={(e) => setCourseFilter(e.target.value)}
-          className="border border-gray-300 px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-1/3"
+          className="border px-3 py-2 rounded w-1/3"
         />
         <input
           type="text"
           placeholder="Filter by Assignment ID"
           value={idFilter}
           onChange={(e) => setIdFilter(e.target.value)}
-          className="border border-gray-300 px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-1/3"
+          className="border px-3 py-2 rounded w-1/3"
         />
+        <select
+          value={semesterFilter}
+          onChange={(e) => setSemesterFilter(e.target.value)}
+          className="border px-3 py-2 rounded"
+        >
+          {semesters.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Assignment Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-          <thead>
-            <tr className="bg-gray-100 text-left text-gray-600">
-              <th className="px-4 py-3">Assignment ID</th>
-              <th className="px-4 py-3">Course ID</th>
-              <th className="px-4 py-3">Title</th>
-              <th className="px-4 py-3">Due Date</th>
-              <th className="px-4 py-3">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((a) => (
-              <tr
-                key={a.id}
-                className="border-t border-gray-200 hover:bg-gray-50 transition-colors"
-              >
-                <td className="px-4 py-3">{a.id}</td>
-                <td className="px-4 py-3">{a.courseId}</td>
-                <td className="px-4 py-3">{a.title}</td>
-                <td className="px-4 py-3">{a.dueDate}</td>
-                <td
-                  className={`px-4 py-3 font-medium ${
-                    a.status === "Completed"
-                      ? "text-green-600"
-                      : a.status === "Ongoing"
-                      ? "text-yellow-600"
-                      : "text-gray-600"
-                  }`}
-                >
-                  {a.status}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* ✅ Reusable CourseTable */}
+      <CourseTable rows={rows} columns={columns} className="min-w-full" />
     </div>
   );
 };

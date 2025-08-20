@@ -1,28 +1,28 @@
 [
   {
     "id": "A001",
-    "courseId": "CSE101",
+    "courseId": "c_cse101",
     "title": "Linked List Assignment",
     "dueDate": "2025-08-10",
     "status": "Completed"
   },
   {
     "id": "A002",
-    "courseId": "MAT201",
+    "courseId": "c_mat201",
     "title": "Set Theory Quiz",
     "dueDate": "2025-08-15",
     "status": "Ongoing"
   },
   {
     "id": "A003",
-    "courseId": "ENG105",
+    "courseId": "c_eng105",
     "title": "Essay Writing",
     "dueDate": "2025-08-18",
     "status": "Completed"
   },
   {
     "id": "A004",
-    "courseId": "PHY110",
+    "courseId": "c_phy110",
     "title": "Lab Report",
     "dueDate": "2025-08-20",
     "status": "Ongoing"

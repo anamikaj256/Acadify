@@ -1,58 +1,127 @@
-import React from "react";
-import courseData from "../data/courses.json";
+import React, { useState, useEffect, useRef } from "react";
+import { useCourse } from "../context/CourseContext";
+import AddCourse from "../pages/AddCourse";
+import CourseTable from "../components/CourseTable"; 
+import EditCourseForm from "../components/EditCourseForm";
 
 const Courses = () => {
-  const courses = courseData;
+  const { courses = [], updateCourse, deleteCourse } = useCourse();
+
+  // modal + edit state
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const prevCountRef = useRef(Array.isArray(courses) ? courses.length : 0);
+
+  useEffect(() => {
+    const newLen = Array.isArray(courses) ? courses.length : 0;
+    // auto-close add modal if courses length increased
+    if (newLen > prevCountRef.current) {
+      setShowAddModal(false);
+    }
+    prevCountRef.current = newLen;
+  }, [courses]);
+
+  // Confirm & delete
+  const handleDelete = (id) => {
+    if (!id) return;
+    if (window.confirm("Delete this course?")) {
+      deleteCourse(id);
+      if (editingId === id) setEditingId(null);
+    }
+  };
+
+  // Start editing: CourseTable calls this with the course object
+  const handleStartEdit = (course) => {
+    if (!course) return;
+    setEditingId(course.id);
+  };
+
+  // Render editing UI for a row (passed to CourseTable)
+  const renderRowInputs = (course) => {
+    if (!course) return null;
+    return (
+      <EditCourseForm
+        key={`edit-${course.id}`}
+        course={course}
+        onCancel={() => setEditingId(null)}
+        onSave={(id, updates) => {
+          updateCourse(id, updates);
+          setEditingId(null);
+        }}
+      />
+    );
+  };
 
   return (
     <div className="p-6">
-      {/* Page Title */}
-      <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-900">Courses</h2>
-        <p className="text-gray-600">Your enrolled courses and grades</p>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="text-left">
+          <h2 className="text-3xl font-bold text-gray-900">Courses</h2>
+          <p className="text-gray-600">Your enrolled courses and grades</p>
+        </div>
+
+        <div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            Add Course
+          </button>
+        </div>
       </div>
 
-      {/* Card Wrapper (matches Dashboard card style) */}
-      <div className="bg-white shadow-lg rounded-xl p-5 border border-gray-200 overflow-x-auto">
-        <table className="min-w-full bg-white rounded-lg">
-          <thead className="sticky top-0 bg-gray-100 text-gray-700">
-            <tr>
-              <th className="py-3 px-4 text-left">Course Name</th>
-              <th className="py-3 px-4 text-left">Course ID</th>
-              <th className="py-3 px-4 text-left">Credit Units</th>
-              <th className="py-3 px-4 text-left">Grade</th>
-              <th className="py-3 px-4 text-left">Grade Points</th>
-            </tr>
-          </thead>
-          <tbody>
-            {courses.map((course, index) => (
-              <tr
-                key={course.id}
-                className={`${
-                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                } hover:bg-gray-100 transition`}
+      {/* CourseTable — no `rows` prop so it reads courses from context */}
+      <CourseTable
+        editingId={editingId}
+        onStartEdit={handleStartEdit}
+        onDelete={handleDelete} // optional; CourseTable will fallback to context.deleteCourse if omitted
+        renderRowInputs={renderRowInputs}
+        showActions={true}
+        showCode={true}
+        className="mb-6"
+      />
+
+      {/* Add Course Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setShowAddModal(false)}
+            aria-hidden
+          />
+
+          {/* modal content */}
+          <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-lg p-6 z-10">
+            <div className="flex items-start justify-between mb-4">
+              <h4 className="text-lg font-semibold">Add Course</h4>
+              <button
+                className="text-gray-600 hover:text-gray-900"
+                onClick={() => setShowAddModal(false)}
+                aria-label="Close"
               >
-                <td className="py-3 px-4">{course.name}</td>
-                <td className="py-3 px-4">{course.id}</td>
-                <td className="py-3 px-4">{course.credits}</td>
-                <td className="py-3 px-4 font-semibold">{course.grade}</td>
-                <td className="py-3 px-4">{course.gradePoints}</td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr className="bg-gray-100 font-semibold">
-              <td className="py-2 px-4" colSpan="2">
-                Total
-              </td>
-              <td className="py-2 px-4">
-                {courses.reduce((sum, c) => sum + c.credits, 0)}
-              </td>
-              <td colSpan="2"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+                ✕
+              </button>
+            </div>
+
+            {/* AddCourse calls context.addCourse and triggers onAdded/onClose callbacks */}
+            <AddCourse
+              onAdded={() => setShowAddModal(false)}
+              onClose={() => setShowAddModal(false)}
+            />
+
+            <div className="mt-4 text-right">
+              <button
+                className="text-sm text-gray-500"
+                onClick={() => setShowAddModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

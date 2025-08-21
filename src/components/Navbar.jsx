@@ -1,7 +1,6 @@
-import { useLocation, Link } from "react-router-dom";   
+import { useLocation, Link } from "react-router-dom";
 import UserMenu from "./UserMenu";
 import { MdMenu } from "react-icons/md";
-
 
 const routeMap = {
   "": "Home",
@@ -10,8 +9,36 @@ const routeMap = {
   assignments: "Assignments",
 };
 
+// only breadcrumb logic changed below
 function computeBreadcrumb(pathname) {
   const parts = pathname.split("/").filter(Boolean);
+
+  // define canonical order of our known routes
+  const routeOrder = ["", "courses", "cgpa", "assignments"];
+
+  // find the index of the last route from routeOrder that appears in the pathname
+  // special case: if pathname is "/", treat as index 0 (Home)
+  let lastMatchedIndex = -1;
+  for (let i = routeOrder.length - 1; i >= 0; i--) {
+    const key = routeOrder[i];
+    if (key === "" && parts.length === 0) {
+      lastMatchedIndex = 0;
+      break;
+    }
+    if (key !== "" && parts.includes(key)) {
+      lastMatchedIndex = i;
+      break;
+    }
+  }
+
+  // if we matched one of the canonical routes, return the chain up to that index
+  if (lastMatchedIndex >= 0) {
+    return routeOrder
+      .slice(0, lastMatchedIndex + 1)
+      .map((k) => routeMap[k] || (k.charAt(0).toUpperCase() + k.slice(1)));
+  }
+
+  // fallback: original behaviour (map path segments to labels)
   if (parts.length === 0) return ["Home"];
   return [
     "Home",
@@ -22,7 +49,23 @@ function computeBreadcrumb(pathname) {
 const Navbar = ({ onToggleSidebar }) => {
   const location = useLocation();
   const breadcrumbParts = computeBreadcrumb(location.pathname);
-  const isLong = breadcrumbParts.length > 3;
+
+  // --- changed compression logic ---
+  // Keep the canonical 4-item chain visible (Home, Courses, CGPA, Assignments)
+  const canonicalChain = [
+    routeMap[""],
+    routeMap["courses"],
+    routeMap["cgpa"],
+    routeMap["assignments"],
+  ];
+  const isCanonical =
+    breadcrumbParts.length === canonicalChain.length &&
+    canonicalChain.every((label, idx) => breadcrumbParts[idx] === label);
+
+  // Only compress when the breadcrumbs are longer than the canonical chain OR
+  // when not the canonical chain. This prevents hiding Courses/CGPA for Assignments.
+  const isLong = breadcrumbParts.length > 4 || (!isCanonical && breadcrumbParts.length > 3);
+  // --- end changed compression logic ---
 
   // helper to map label back to actual path
   const findPath = (label) => {
@@ -108,4 +151,3 @@ const Navbar = ({ onToggleSidebar }) => {
 };
 
 export default Navbar;
-
